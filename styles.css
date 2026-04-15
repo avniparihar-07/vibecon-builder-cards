@@ -238,19 +238,57 @@ main { padding: 40px 32px 80px; }
 
 .card-identity {
   display: flex;
+  flex-direction: column;
   align-items: center;
+  text-align: center;
   gap: 14px;
   margin: 20px 0 14px;
 }
-.card-identity > div { flex: 1; min-width: 0; }
+.card-avatar-wrap {
+  position: relative;
+  width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+}
+.card-avatar-wrap::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  background: linear-gradient(to bottom, transparent, #0c0c18);
+  pointer-events: none;
+}
+.card-avatar-label {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  white-space: nowrap;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  color: #ffffff;
+  background: rgba(10, 10, 20, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(167, 139, 250, 0.45);
+  padding: 5px 16px;
+  border-radius: 999px;
+}
 .card-avatar {
-  width: 250px;
-  height: 250px;
-  border-radius: 50%;
+  width: 100%;
+  height: 240px;
+  border-radius: 14px;
   background: linear-gradient(135deg, #1a1530, #0c0c18);
   border: 2px solid var(--accent);
-  flex-shrink: 0;
   object-fit: cover;
+  object-position: center top;
+  display: block;
+  box-shadow: 0 0 28px #60a5fa45, 0 0 70px #3b82f628;
 }
 .card-name {
   font-family: var(--display);
@@ -260,6 +298,7 @@ main { padding: 40px 32px 80px; }
   line-height: 1;
   letter-spacing: -0.5px;
   word-break: break-word;
+  text-align: center;
 }
 .avatar-maker {
   display: flex;
@@ -322,6 +361,7 @@ main { padding: 40px 32px 80px; }
   font-size: 14px;
   margin-bottom: 18px;
   word-break: break-word;
+  text-align: center;
 }
 .card-pitch {
   background: #0f0f1c;
@@ -331,14 +371,14 @@ main { padding: 40px 32px 80px; }
   padding: 12px 14px;
   font-size: 12px;
   color: #c8c8dc;
-  margin-bottom: 18px;
+  margin-bottom: 0;
   font-style: italic;
   line-height: 1.5;
 }
 
 .card-stats {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 10px;
   margin-bottom: 22px;
 }
@@ -365,6 +405,13 @@ main { padding: 40px 32px 80px; }
   line-height: 1.3;
 }
 
+.card-foot-left {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
 .card-foot {
   display: flex;
   justify-content: space-between;

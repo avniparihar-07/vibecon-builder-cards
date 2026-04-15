@@ -1,7 +1,7 @@
 // ============ VibeCon Builder Cards ============
 // Live-preview split UI. Card data lives in URL hash — zero-delay QR scanning.
 
-const FIELDS = ["name", "building", "pitch", "stack", "twitter", "linkedin", "stage", "avatar"];
+const FIELDS = ["name", "building", "pitch", "twitter", "linkedin", "avatar"];
 const avatarFallback = (seed) =>
   `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(seed || "vibecon")}`;
 
@@ -78,8 +78,6 @@ const DEFAULTS = {
   name: "Your name",
   building: "Your project",
   pitch: '"your one-line pitch goes here"',
-  stack: "—",
-  stage: "Early prototype",
   twitter: "@handle",
   linkedin: "linkedin",
 };
@@ -167,8 +165,6 @@ function renderCreate(prefill) {
     const text =
       `${d.name || "Builder"} — ${d.building || ""}\n` +
       `"${d.pitch || ""}"\n` +
-      `Stack: ${d.stack || "—"}\n` +
-      `Stage: ${d.stage || "—"}\n` +
       (d.twitter ? `Twitter: ${d.twitter}\n` : "") +
       (d.linkedin ? `LinkedIn: ${d.linkedin}\n` : "") +
       link;
@@ -282,7 +278,7 @@ function renderCollection() {
     el.innerHTML = `<button class="remove" title="Remove">×</button><h3></h3><div class="p"></div><div class="m"></div>`;
     el.querySelector("h3").textContent = c.name || "Unknown";
     el.querySelector(".p").textContent = c.building || "";
-    el.querySelector(".m").textContent = (c.stack || "—") + " · met " + new Date(c.addedAt).toLocaleDateString();
+    el.querySelector(".m").textContent = "met " + new Date(c.addedAt).toLocaleDateString();
     el.addEventListener("click", (e) => {
       if (e.target.closest(".remove")) return;
       location.hash = "c=" + encodeCard(c);

@@ -42,10 +42,6 @@
           <span>One-line pitch</span>
           <textarea name="pitch" placeholder="Your one-line pitch" maxlength="120" rows="2"></textarea>
         </label>
-        <label class="field">
-          <span>Stack / Tools</span>
-          <input name="stack" placeholder="Your stack" maxlength="80" />
-        </label>
         <div class="row">
           <label class="field">
             <span>Twitter / X</span>
@@ -56,16 +52,6 @@
             <input name="linkedin" placeholder="Your LinkedIn" maxlength="80" />
           </label>
         </div>
-        <label class="field">
-          <span>Builder stage</span>
-          <select name="stage">
-            <option>Idea</option>
-            <option selected>Early prototype</option>
-            <option>Beta</option>
-            <option>Launched</option>
-            <option>Scaling</option>
-          </select>
-        </label>
         <div class="field">
           <span>Your photo</span>
           <div class="avatar-maker">
@@ -97,23 +83,22 @@
           </div>
         </div>
         <div class="card-identity">
-          <img class="card-avatar" id="card-avatar" alt="" />
+          <div class="card-avatar-wrap">
+            <div class="card-avatar-label">VibeCon '26</div>
+            <img class="card-avatar" id="card-avatar" alt="" />
+          </div>
           <div>
             <h2 class="card-name" data-field="name">Your name</h2>
             <div class="card-project" data-field="building">Your project</div>
           </div>
         </div>
-        <div class="card-pitch"><span data-field="pitch">"your one-line pitch goes here"</span></div>
-        <div class="card-stats">
-          <div class="stat"><span class="k">STACK</span><span class="v" data-field="stack">—</span></div>
-          <div class="stat"><span class="k">STAGE</span><span class="v" data-field="stage">Early prototype</span></div>
-          <div class="stat"><span class="k">EVENT</span><span class="v">VibeCon 2025</span></div>
-          <div class="stat"><span class="k">CARD TYPE</span><span class="v">Builder</span></div>
-        </div>
         <div class="card-foot">
-          <div class="card-socials">
-            <div><span class="pre">tw</span> <span data-field="twitter">@handle</span></div>
-            <div><span class="pre">li</span> <span data-field="linkedin">linkedin</span></div>
+          <div class="card-foot-left">
+            <div class="card-pitch"><span data-field="pitch">"your one-line pitch goes here"</span></div>
+            <div class="card-socials">
+              <div><span class="pre">tw</span> <span data-field="twitter">@handle</span></div>
+              <div><span class="pre">li</span> <span data-field="linkedin">linkedin</span></div>
+            </div>
           </div>
           <div class="card-qr-wrap">
             <div class="qr-box"><canvas id="qr"></canvas></div>
