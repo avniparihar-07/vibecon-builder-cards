@@ -6,6 +6,7 @@ const avatarFallback = (seed) =>
   `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(seed || "vibecon")}`;
 
 let uploadedPhoto = null;
+let thumbPhoto = null;
 const AVATAR_LS = (name) => "vibecon_avatar_" + (name || "default").toLowerCase();
 const STORAGE_KEY = "vibecon_collection_v1";
 const SELF_KEY = "vibecon_self_v1";
@@ -123,6 +124,7 @@ function readForm() {
   const fd = new FormData(form);
   const data = {};
   FIELDS.forEach(f => { data[f] = (fd.get(f) || "").toString(); });
+  data.avatar = thumbPhoto || "";
   return data;
 }
 
@@ -146,8 +148,13 @@ function renderCreate(prefill) {
   // Photo upload
   buildPhotoUpload(refresh);
   const savedAv = localStorage.getItem(AVATAR_LS((prefill && prefill.name) || readForm().name));
-  if (savedAv) uploadedPhoto = savedAv;
-  else if (prefill && prefill.avatar) uploadedPhoto = prefill.avatar;
+  if (savedAv) {
+    uploadedPhoto = savedAv;
+    if (prefill && prefill.avatar) thumbPhoto = prefill.avatar;
+  } else if (prefill && prefill.avatar) {
+    uploadedPhoto = prefill.avatar;
+    thumbPhoto = prefill.avatar;
+  }
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -217,10 +224,9 @@ function buildPhotoUpload(refresh) {
         e.preventDefault();
         e.stopPropagation();
         uploadedPhoto = null;
+        thumbPhoto = null;
         const name = readForm().name || "default";
         localStorage.removeItem(AVATAR_LS(name));
-        const hiddenAv = document.querySelector('input[name="avatar"]');
-        if (hiddenAv) hiddenAv.value = "";
         fileInput.value = "";
         renderSlot();
         refresh();
@@ -241,11 +247,9 @@ function buildPhotoUpload(refresh) {
     if (!file) return;
     try {
       uploadedPhoto = await resizeImage(file, 512);
-      const thumb = await resizeImage(file, 64, 0.5);
+      thumbPhoto = await resizeImage(file, 32, 0.4);
       const name = readForm().name || "default";
       localStorage.setItem(AVATAR_LS(name), uploadedPhoto);
-      const hiddenAv = document.querySelector('input[name="avatar"]');
-      if (hiddenAv) hiddenAv.value = thumb;
       renderSlot();
       refresh();
     } catch (err) {
