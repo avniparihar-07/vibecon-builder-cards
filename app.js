@@ -153,9 +153,9 @@ function renderCreate(prefill) {
   const savedAv = localStorage.getItem(AVATAR_LS((prefill && prefill.name) || readForm().name));
   if (savedAv) {
     uploadedPhoto = savedAv;
-    if (prefill && prefill.avatar) thumbPhoto = prefill.avatar;
-  } else if (prefill && prefill.avatar) {
-    uploadedPhoto = prefill.avatar;
+    // only restore px: format thumbnails — ignore old JPEG blobs that bloat the QR
+    if (prefill && prefill.avatar && prefill.avatar.startsWith("px:")) thumbPhoto = prefill.avatar;
+  } else if (prefill && prefill.avatar && prefill.avatar.startsWith("px:")) {
     thumbPhoto = prefill.avatar;
   }
 
@@ -257,6 +257,8 @@ function buildPhotoUpload(refresh) {
       refresh();
     } catch (err) {
       console.error(err);
+      thumbPhoto = null;
+      refresh();
     }
   });
 }
