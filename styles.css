@@ -436,15 +436,16 @@ main { padding: 40px 32px 80px; }
   flex-shrink: 0;
 }
 .qr-box {
-  width: 150px;
-  height: 150px;
+  width: 160px;
+  height: 160px;
   background: #fff;
-  padding: 7px;
+  padding: 0;
   border-radius: 10px;
   display: block;
   flex-shrink: 0;
+  overflow: hidden;
 }
-.qr-box canvas { width: 100% !important; height: 100% !important; display: block; }
+.qr-box canvas { width: 160px !important; height: 160px !important; display: block; }
 .qr-caption {
   font-size: 8px;
   color: var(--muted);
@@ -583,7 +584,8 @@ body.card-only-mode main { padding: 40px 20px; }
   .card-name { font-size: 28px; }
   .card-stats { grid-template-columns: 1fr 1fr; gap: 8px; }
   .stat { padding: 8px 10px; min-height: 50px; }
-  .qr-box { width: 130px; height: 130px; padding: 6px; }
+  .qr-box { width: 140px; height: 140px; padding: 0; }
+  .qr-box canvas { width: 140px !important; height: 140px !important; }
   .card { padding: 18px; border-radius: 18px; }
   .card-foot { flex-direction: column-reverse; align-items: flex-start; gap: 14px; }
   .card-qr-wrap { align-self: center; }

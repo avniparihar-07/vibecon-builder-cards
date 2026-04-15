@@ -108,11 +108,11 @@ function updateCard(data) {
     new QRious({
       element: qrEl,
       value: url,
-      size: 300,
+      size: 400,
       level: "M",
       background: "#ffffff",
       foreground: "#0a0a14",
-      padding: 0,
+      padding: 10,
     });
   } catch (e) {
     console.error("QR render failed", e);
