@@ -117,6 +117,8 @@ function updateCard(data) {
   } catch (e) {
     console.error("QR render failed", e);
   }
+  qrEl.style.width = "160px";
+  qrEl.style.height = "160px";
 }
 
 function readForm() {
