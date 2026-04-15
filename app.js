@@ -96,6 +96,7 @@ function updateCard(data) {
     const saved = localStorage.getItem(AVATAR_LS(data.name));
     if (uploadedPhoto) av.src = uploadedPhoto;
     else if (saved) av.src = saved;
+    else if (data.avatar) av.src = data.avatar;
     else av.src = avatarFallback(data.name || "vibecon");
   }
 
@@ -107,7 +108,7 @@ function updateCard(data) {
       element: qrEl,
       value: url,
       size: 300,
-      level: "M",
+      level: "L",
       background: "#ffffff",
       foreground: "#0a0a14",
       padding: 0,
@@ -146,6 +147,7 @@ function renderCreate(prefill) {
   buildPhotoUpload(refresh);
   const savedAv = localStorage.getItem(AVATAR_LS((prefill && prefill.name) || readForm().name));
   if (savedAv) uploadedPhoto = savedAv;
+  else if (prefill && prefill.avatar) uploadedPhoto = prefill.avatar;
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -217,6 +219,8 @@ function buildPhotoUpload(refresh) {
         uploadedPhoto = null;
         const name = readForm().name || "default";
         localStorage.removeItem(AVATAR_LS(name));
+        const hiddenAv = document.querySelector('input[name="avatar"]');
+        if (hiddenAv) hiddenAv.value = "";
         fileInput.value = "";
         renderSlot();
         refresh();
@@ -237,8 +241,11 @@ function buildPhotoUpload(refresh) {
     if (!file) return;
     try {
       uploadedPhoto = await resizeImage(file, 512);
+      const thumb = await resizeImage(file, 64, 0.5);
       const name = readForm().name || "default";
       localStorage.setItem(AVATAR_LS(name), uploadedPhoto);
+      const hiddenAv = document.querySelector('input[name="avatar"]');
+      if (hiddenAv) hiddenAv.value = thumb;
       renderSlot();
       refresh();
     } catch (err) {
@@ -247,7 +254,7 @@ function buildPhotoUpload(refresh) {
   });
 }
 
-function resizeImage(file, maxDim) {
+function resizeImage(file, maxDim, quality = 0.85) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
@@ -258,7 +265,7 @@ function resizeImage(file, maxDim) {
       canvas.width = Math.round(width);
       canvas.height = Math.round(height);
       canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL("image/jpeg", 0.85));
+      resolve(canvas.toDataURL("image/jpeg", quality));
     };
     img.onerror = reject;
     img.src = URL.createObjectURL(file);
