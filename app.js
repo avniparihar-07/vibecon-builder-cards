@@ -109,7 +109,7 @@ function updateCard(data) {
       element: qrEl,
       value: url,
       size: 300,
-      level: "L",
+      level: "M",
       background: "#ffffff",
       foreground: "#0a0a14",
       padding: 0,
@@ -247,7 +247,7 @@ function buildPhotoUpload(refresh) {
     if (!file) return;
     try {
       uploadedPhoto = await resizeImage(file, 512);
-      thumbPhoto = await resizeImage(file, 32, 0.4);
+      thumbPhoto = await resizeImage(file, 24, 0.3);
       const name = readForm().name || "default";
       localStorage.setItem(AVATAR_LS(name), uploadedPhoto);
       renderSlot();
