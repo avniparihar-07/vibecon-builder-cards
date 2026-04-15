@@ -1,6 +1,19 @@
 // ============ VibeCon Builder Cards ============
 // Live-preview split UI. Card data lives in URL hash — zero-delay QR scanning.
 
+// ---------- Supabase ----------
+const _sb = window.supabase.createClient(
+  "https://fuumjemjsdruyswnloxb.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1dW1qZW1qc2RydXlzd25sb3hiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4NDE0NTQsImV4cCI6MjA4NDQxNzQ1NH0.FLenY_66EYMJIIJp9WQRyihWUwy8YY9aN1Kw06dQs1Y"
+);
+async function uploadAvatarToStorage(dataUrl) {
+  const blob = await fetch(dataUrl).then(r => r.blob());
+  const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`;
+  const { data, error } = await _sb.storage.from("avatars").upload(filename, blob, { contentType: "image/jpeg", upsert: false });
+  if (error) throw error;
+  return _sb.storage.from("avatars").getPublicUrl(data.path).data.publicUrl;
+}
+
 const FIELDS = ["name", "building", "pitch", "twitter", "linkedin", "avatar"];
 const avatarFallback = (seed) =>
   `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(seed || "vibecon")}`;
@@ -153,9 +166,9 @@ function renderCreate(prefill) {
   const savedAv = localStorage.getItem(AVATAR_LS((prefill && prefill.name) || readForm().name));
   if (savedAv) {
     uploadedPhoto = savedAv;
-    // only restore px: format thumbnails — ignore old JPEG blobs that bloat the QR
-    if (prefill && prefill.avatar && prefill.avatar.startsWith("px:")) thumbPhoto = prefill.avatar;
-  } else if (prefill && prefill.avatar && prefill.avatar.startsWith("px:")) {
+    // restore px: pixel thumbs or real Supabase URLs
+    if (prefill && prefill.avatar && (prefill.avatar.startsWith("px:") || prefill.avatar.startsWith("http"))) thumbPhoto = prefill.avatar;
+  } else if (prefill && prefill.avatar && (prefill.avatar.startsWith("px:") || prefill.avatar.startsWith("http"))) {
     thumbPhoto = prefill.avatar;
   }
 
@@ -250,13 +263,16 @@ function buildPhotoUpload(refresh) {
     if (!file) return;
     try {
       uploadedPhoto = await resizeImage(file, 512);
-      thumbPhoto = await makePixelThumb(file);
+      thumbPhoto = null; // will be set after upload
       const name = readForm().name || "default";
       localStorage.setItem(AVATAR_LS(name), uploadedPhoto);
       renderSlot();
       refresh();
+      // Upload to Supabase storage — gives a real URL for the QR
+      thumbPhoto = await uploadAvatarToStorage(uploadedPhoto);
+      refresh();
     } catch (err) {
-      console.error(err);
+      console.error("Avatar upload failed:", err);
       thumbPhoto = null;
       refresh();
     }
