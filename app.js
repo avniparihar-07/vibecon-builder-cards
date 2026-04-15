@@ -103,7 +103,10 @@ function updateCard(data) {
 
   const qrEl = document.getElementById("qr");
   if (!qrEl) return;
-  const url = location.origin + location.pathname + "#c=" + encodeCard(data);
+  // Strip avatar from QR URL — avatar base64 bloats the URL into a
+  // high-version QR with hundreds of tiny modules that can't be scanned.
+  const qrData = { ...data, avatar: "" };
+  const url = location.origin + location.pathname + "#c=" + encodeCard(qrData);
   try {
     new QRious({
       element: qrEl,
