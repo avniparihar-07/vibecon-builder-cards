@@ -67,22 +67,17 @@
           </select>
         </label>
         <div class="field">
-          <span>AI Avatar — Nano Banana ✨</span>
+          <span>Your photo</span>
           <div class="avatar-maker">
-            <div class="avatar-row">
-              <label for="photo-input" class="upload-slot" id="upload-slot">
-                <div class="upload-placeholder">
-                  <div class="big">📷</div>
-                  <div>upload photo</div>
-                </div>
-              </label>
-              <input type="file" id="photo-input" accept="image/*" capture="user" hidden />
-              <div class="style-grid" id="style-grid"></div>
-            </div>
-            <button type="button" class="ghost-cta" id="btn-generate" disabled>✨ Generate avatar</button>
-            <div class="gen-status" id="gen-status"></div>
+            <label for="photo-input" class="upload-slot upload-slot-wide" id="upload-slot">
+              <div class="upload-placeholder">
+                <div class="big">📷</div>
+                <div>tap to upload your photo</div>
+              </div>
+            </label>
+            <input type="file" id="photo-input" accept="image/*" capture="user" hidden />
           </div>
-          <input type="hidden" name="avatar" value="superhero" />
+          <input type="hidden" name="avatar" value="" />
         </div>
         <button type="submit" class="cta">Save my card + join VibeCon ↗</button>
       </form>

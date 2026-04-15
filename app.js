@@ -5,17 +5,7 @@ const FIELDS = ["name", "building", "pitch", "stack", "twitter", "linkedin", "st
 const avatarFallback = (seed) =>
   `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(seed || "vibecon")}`;
 
-const AI_STYLES = [
-  { id: "superhero", label: "Superhero", em: "🦸", prompt: "Transform the person in this photo into a heroic Marvel-style superhero with a colorful cape and bold suit, dramatic lighting, photorealistic, close-up portrait, face clearly recognizable." },
-  { id: "catwoman",  label: "Catwoman",  em: "🐱", prompt: "Transform the person in this photo into Catwoman — sleek black leather catsuit, cat-ear mask, neon-lit rooftop at night, photorealistic, close-up portrait, face clearly recognizable." },
-  { id: "astronaut", label: "Astronaut", em: "🚀", prompt: "Transform the person in this photo into an astronaut wearing a white NASA space suit with a clear visor, Earth in the background, photorealistic, close-up portrait, face clearly recognizable through visor." },
-  { id: "wizard",    label: "Wizard",    em: "🧙", prompt: "Transform the person in this photo into a powerful fantasy wizard wearing flowing robes, holding a glowing staff, mystical aura, photorealistic, close-up portrait, face clearly recognizable." },
-  { id: "ninja",     label: "Ninja",     em: "🥷", prompt: "Transform the person in this photo into a stealth ninja wearing black attire, katana strapped across back, moonlit rooftop, photorealistic, close-up portrait, face clearly visible." },
-  { id: "cyberpunk", label: "Cyberpunk", em: "🤖", prompt: "Transform the person in this photo into a cyberpunk character with neon tattoos and futuristic visor, rainy neon-lit city background, photorealistic, close-up portrait, face clearly recognizable." },
-];
-
-let photoDataUrl = null;
-let generatedAvatar = null;
+let uploadedPhoto = null;
 const AVATAR_LS = (name) => "vibecon_avatar_" + (name || "default").toLowerCase();
 const STORAGE_KEY = "vibecon_collection_v1";
 const SELF_KEY = "vibecon_self_v1";
@@ -106,7 +96,7 @@ function updateCard(data) {
   const av = app.querySelector("#card-avatar");
   if (av) {
     const saved = localStorage.getItem(AVATAR_LS(data.name));
-    if (generatedAvatar) av.src = generatedAvatar;
+    if (uploadedPhoto) av.src = uploadedPhoto;
     else if (saved) av.src = saved;
     else av.src = avatarFallback(data.name || "vibecon");
   }
@@ -154,11 +144,10 @@ function renderCreate(prefill) {
   form.addEventListener("input", refresh);
   form.addEventListener("change", refresh);
 
-  // Build AI avatar maker
-  buildAvatarMaker(form, prefill, refresh);
-  // If there's a saved avatar for this name, load it
+  // Photo upload
+  buildPhotoUpload(refresh);
   const savedAv = localStorage.getItem(AVATAR_LS((prefill && prefill.name) || readForm().name));
-  if (savedAv) generatedAvatar = savedAv;
+  if (savedAv) uploadedPhoto = savedAv;
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -218,52 +207,48 @@ function renderCardOnly(data) {
   });
 }
 
-// ---------- AI avatar maker ----------
-function buildAvatarMaker(form, prefill, refresh) {
-  const grid = document.getElementById("style-grid");
+// ---------- Photo upload ----------
+function buildPhotoUpload(refresh) {
   const slot = document.getElementById("upload-slot");
   const fileInput = document.getElementById("photo-input");
-  const genBtn = document.getElementById("btn-generate");
-  const hidden = form.elements.namedItem("avatar");
-  let selectedStyle = (prefill && prefill.avatar) || hidden.value || "superhero";
-  hidden.value = selectedStyle;
 
-  AI_STYLES.forEach(s => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "style-btn" + (s.id === selectedStyle ? " active" : "");
-    btn.innerHTML = `<div class="em">${s.em}</div>${s.label}`;
-    btn.addEventListener("click", () => {
-      selectedStyle = s.id;
-      hidden.value = s.id;
-      grid.querySelectorAll(".style-btn").forEach(b => b.classList.toggle("active", b === btn));
-    });
-    grid.appendChild(btn);
-  });
+  const renderSlot = () => {
+    if (uploadedPhoto) {
+      slot.innerHTML = `<img src="${uploadedPhoto}" alt="" /><button type="button" class="photo-remove" aria-label="Remove photo">×</button>`;
+      slot.querySelector(".photo-remove").addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadedPhoto = null;
+        const name = readForm().name || "default";
+        localStorage.removeItem(AVATAR_LS(name));
+        fileInput.value = "";
+        renderSlot();
+        refresh();
+      });
+    } else {
+      slot.innerHTML = `
+        <div class="upload-placeholder">
+          <div class="big">📷</div>
+          <div>tap to upload your photo</div>
+        </div>`;
+    }
+  };
+
+  renderSlot();
 
   fileInput.addEventListener("change", async (e) => {
     const file = e.target.files[0];
     if (!file) return;
     try {
-      photoDataUrl = await resizeImage(file, 512);
-      slot.innerHTML = `<img src="${photoDataUrl}" alt="" />`;
-      genBtn.disabled = false;
-      setGenStatus("");
+      uploadedPhoto = await resizeImage(file, 512);
+      const name = readForm().name || "default";
+      localStorage.setItem(AVATAR_LS(name), uploadedPhoto);
+      renderSlot();
+      refresh();
     } catch (err) {
-      setGenStatus("Failed to read image", true);
+      console.error(err);
     }
   });
-
-  genBtn.addEventListener("click", () => generateAvatar(selectedStyle, refresh));
-}
-
-function setGenStatus(msg, kind) {
-  const el = document.getElementById("gen-status");
-  if (!el) return;
-  el.textContent = msg || "";
-  el.classList.remove("error", "ok");
-  if (kind === "error") el.classList.add("error");
-  if (kind === "ok") el.classList.add("ok");
 }
 
 function resizeImage(file, maxDim) {
@@ -282,63 +267,6 @@ function resizeImage(file, maxDim) {
     img.onerror = reject;
     img.src = URL.createObjectURL(file);
   });
-}
-
-async function generateAvatar(styleId, refresh) {
-  if (!photoDataUrl) { setGenStatus("Upload a photo first", "error"); return; }
-  let key = localStorage.getItem("vibecon_gemini_key");
-  if (!key) {
-    key = prompt("Enter your Gemini API key (free from aistudio.google.com/apikey):");
-    if (!key) return;
-    key = key.trim();
-    localStorage.setItem("vibecon_gemini_key", key);
-  }
-  const style = AI_STYLES.find(s => s.id === styleId) || AI_STYLES[0];
-  const btn = document.getElementById("btn-generate");
-  btn.disabled = true;
-  setGenStatus("✨ Generating your avatar… (~10s)");
-
-  try {
-    const base64 = photoDataUrl.split(",")[1];
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${encodeURIComponent(key)}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              { text: style.prompt },
-              { inline_data: { mime_type: "image/jpeg", data: base64 } },
-            ],
-          }],
-        }),
-      }
-    );
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error?.message || `API error ${res.status}`);
-    }
-    const json = await res.json();
-    const parts = json.candidates?.[0]?.content?.parts || [];
-    const imgPart = parts.find(p => p.inline_data || p.inlineData);
-    if (!imgPart) throw new Error("No image returned by the model");
-    const inline = imgPart.inline_data || imgPart.inlineData;
-    const mime = inline.mime_type || inline.mimeType || "image/png";
-    generatedAvatar = `data:${mime};base64,${inline.data}`;
-    const name = readForm().name || "default";
-    localStorage.setItem(AVATAR_LS(name), generatedAvatar);
-    setGenStatus("✓ Avatar generated!", "ok");
-    refresh();
-  } catch (e) {
-    console.error(e);
-    setGenStatus("Failed: " + e.message, "error");
-    if (/api key|permission|unauthorized|invalid/i.test(e.message)) {
-      localStorage.removeItem("vibecon_gemini_key");
-    }
-  } finally {
-    btn.disabled = false;
-  }
 }
 
 function renderCollection() {
