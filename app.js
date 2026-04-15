@@ -97,6 +97,7 @@ function updateCard(data) {
     const saved = localStorage.getItem(AVATAR_LS(data.name));
     if (uploadedPhoto) av.src = uploadedPhoto;
     else if (saved) av.src = saved;
+    else if (data.avatar && data.avatar.startsWith("px:")) av.src = decodePixelThumb(data.avatar);
     else if (data.avatar) av.src = data.avatar;
     else av.src = avatarFallback(data.name || "vibecon");
   }
@@ -249,7 +250,7 @@ function buildPhotoUpload(refresh) {
     if (!file) return;
     try {
       uploadedPhoto = await resizeImage(file, 512);
-      thumbPhoto = await resizeImage(file, 16, 0.2);
+      thumbPhoto = await makePixelThumb(file);
       const name = readForm().name || "default";
       localStorage.setItem(AVATAR_LS(name), uploadedPhoto);
       renderSlot();
@@ -258,6 +259,57 @@ function buildPhotoUpload(refresh) {
       console.error(err);
     }
   });
+}
+
+function makePixelThumb(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const S = 10;
+      const cv = document.createElement("canvas");
+      cv.width = S; cv.height = S;
+      cv.getContext("2d").drawImage(img, 0, 0, S, S);
+      const d = cv.getContext("2d").getImageData(0, 0, S, S).data;
+      let bits = "";
+      for (let i = 0; i < d.length; i += 4) {
+        const r = Math.min(3, Math.round(d[i] / 85));
+        const g = Math.min(3, Math.round(d[i+1] / 85));
+        const b = Math.min(3, Math.round(d[i+2] / 85));
+        bits += r.toString(2).padStart(2,'0') + g.toString(2).padStart(2,'0') + b.toString(2).padStart(2,'0');
+      }
+      const bytes = [];
+      for (let i = 0; i < bits.length; i += 8)
+        bytes.push(parseInt(bits.substr(i, 8).padEnd(8,'0'), 2));
+      resolve("px:" + btoa(String.fromCharCode(...bytes)));
+    };
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+function decodePixelThumb(data) {
+  const b64 = data.slice(3);
+  const raw = atob(b64);
+  let bits = "";
+  for (let i = 0; i < raw.length; i++)
+    bits += raw.charCodeAt(i).toString(2).padStart(8,'0');
+  const S = 10;
+  const cv = document.createElement("canvas");
+  cv.width = S; cv.height = S;
+  const ctx = cv.getContext("2d");
+  const id = ctx.createImageData(S, S);
+  for (let p = 0; p < S * S; p++) {
+    const off = p * 6;
+    const r = parseInt(bits.substr(off,   2), 2) * 85;
+    const g = parseInt(bits.substr(off+2, 2), 2) * 85;
+    const b = parseInt(bits.substr(off+4, 2), 2) * 85;
+    id.data[p*4]   = r;
+    id.data[p*4+1] = g;
+    id.data[p*4+2] = b;
+    id.data[p*4+3] = 255;
+  }
+  ctx.putImageData(id, 0, 0);
+  return cv.toDataURL("image/png");
 }
 
 function resizeImage(file, maxDim, quality = 0.85) {
