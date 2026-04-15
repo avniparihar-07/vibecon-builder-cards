@@ -95,11 +95,11 @@ function updateCard(data) {
   const av = app.querySelector("#card-avatar");
   if (av) {
     const saved = localStorage.getItem(AVATAR_LS(data.name));
-    if (uploadedPhoto) av.src = uploadedPhoto;
-    else if (saved) av.src = saved;
-    else if (data.avatar && data.avatar.startsWith("px:")) av.src = decodePixelThumb(data.avatar);
-    else if (data.avatar) av.src = data.avatar;
-    else av.src = avatarFallback(data.name || "vibecon");
+    if (uploadedPhoto) { av.src = uploadedPhoto; av.style.imageRendering = ""; }
+    else if (saved) { av.src = saved; av.style.imageRendering = ""; }
+    else if (data.avatar && data.avatar.startsWith("px:")) { av.src = decodePixelThumb(data.avatar); av.style.imageRendering = "pixelated"; }
+    else if (data.avatar) { av.src = data.avatar; av.style.imageRendering = ""; }
+    else { av.src = avatarFallback(data.name || "vibecon"); av.style.imageRendering = ""; }
   }
 
   const qrEl = document.getElementById("qr");
@@ -267,7 +267,7 @@ function makePixelThumb(file) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
-      const S = 10;
+      const S = 16;
       const cv = document.createElement("canvas");
       cv.width = S; cv.height = S;
       cv.getContext("2d").drawImage(img, 0, 0, S, S);
@@ -295,7 +295,7 @@ function decodePixelThumb(data) {
   let bits = "";
   for (let i = 0; i < raw.length; i++)
     bits += raw.charCodeAt(i).toString(2).padStart(8,'0');
-  const S = 10;
+  const S = 16;
   const cv = document.createElement("canvas");
   cv.width = S; cv.height = S;
   const ctx = cv.getContext("2d");
