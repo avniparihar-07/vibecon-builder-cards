@@ -244,8 +244,8 @@ main { padding: 40px 32px 80px; }
 }
 .card-identity > div { flex: 1; min-width: 0; }
 .card-avatar {
-  width: 100px;
-  height: 100px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   background: linear-gradient(135deg, #1a1530, #0c0c18);
   border: 2px solid var(--accent);
