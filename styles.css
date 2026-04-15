@@ -414,7 +414,7 @@ main { padding: 40px 32px 80px; }
 }
 .card-foot {
   display: grid;
-  grid-template-columns: 1fr 160px;
+  grid-template-columns: 1fr 200px;
   align-items: end;
   gap: 14px;
   margin-top: 6px;
@@ -436,10 +436,10 @@ main { padding: 40px 32px 80px; }
   flex-shrink: 0;
 }
 .qr-box {
-  width: 160px !important;
-  height: 160px !important;
-  min-width: 160px !important;
-  min-height: 160px !important;
+  width: 200px !important;
+  height: 200px !important;
+  min-width: 200px !important;
+  min-height: 200px !important;
   background: #fff;
   padding: 0;
   border-radius: 10px;
@@ -447,7 +447,7 @@ main { padding: 40px 32px 80px; }
   flex-shrink: 0;
   overflow: hidden;
 }
-.qr-box canvas { width: 160px !important; height: 160px !important; display: block; }
+.qr-box canvas { width: 200px !important; height: 200px !important; display: block; }
 .qr-caption {
   font-size: 8px;
   color: var(--muted);
@@ -586,8 +586,8 @@ body.card-only-mode main { padding: 40px 20px; }
   .card-name { font-size: 28px; }
   .card-stats { grid-template-columns: 1fr 1fr; gap: 8px; }
   .stat { padding: 8px 10px; min-height: 50px; }
-  .qr-box { width: 140px; height: 140px; padding: 0; }
-  .qr-box canvas { width: 140px !important; height: 140px !important; }
+  .qr-box { width: 160px !important; height: 160px !important; min-width: 160px !important; }
+  .qr-box canvas { width: 160px !important; height: 160px !important; }
   .card { padding: 18px; border-radius: 18px; }
   .card-foot { flex-direction: column-reverse; align-items: flex-start; gap: 14px; }
   .card-qr-wrap { align-self: center; }

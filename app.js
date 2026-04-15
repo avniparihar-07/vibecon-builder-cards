@@ -103,10 +103,7 @@ function updateCard(data) {
 
   const qrEl = document.getElementById("qr");
   if (!qrEl) return;
-  // Strip avatar from QR URL — avatar base64 bloats the URL into a
-  // high-version QR with hundreds of tiny modules that can't be scanned.
-  const qrData = { ...data, avatar: "" };
-  const url = location.origin + location.pathname + "#c=" + encodeCard(qrData);
+  const url = location.origin + location.pathname + "#c=" + encodeCard(data);
   try {
     new QRious({
       element: qrEl,
@@ -120,8 +117,8 @@ function updateCard(data) {
   } catch (e) {
     console.error("QR render failed", e);
   }
-  qrEl.style.width = "160px";
-  qrEl.style.height = "160px";
+  qrEl.style.width = "200px";
+  qrEl.style.height = "200px";
 }
 
 function readForm() {
@@ -252,7 +249,7 @@ function buildPhotoUpload(refresh) {
     if (!file) return;
     try {
       uploadedPhoto = await resizeImage(file, 512);
-      thumbPhoto = await resizeImage(file, 24, 0.3);
+      thumbPhoto = await resizeImage(file, 16, 0.2);
       const name = readForm().name || "default";
       localStorage.setItem(AVATAR_LS(name), uploadedPhoto);
       renderSlot();
