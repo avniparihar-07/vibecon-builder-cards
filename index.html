@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VibeCon — Builder Cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+<script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">VibeCon</div>
+  <nav class="tabs">
+    <a href="#create" data-tab="create">Create card</a>
+    <a href="#collection" data-tab="collection">My collection</a>
+  </nav>
+  <div class="year-badge">VibeCon '25</div>
+</header>
+
+<main id="app"></main>
+
+<template id="view-create">
+  <section class="split">
+    <div class="form-col">
+      <h1 class="display">Build your card</h1>
+      <p class="sub">// fill in your details. card generates live.</p>
+      <form id="card-form" class="form" autocomplete="off">
+        <label class="field">
+          <span>Full name</span>
+          <input name="name" placeholder="Your name" maxlength="40" />
+        </label>
+        <label class="field">
+          <span>What you're building</span>
+          <input name="building" placeholder="Your project" maxlength="60" />
+        </label>
+        <label class="field">
+          <span>One-line pitch</span>
+          <textarea name="pitch" placeholder="Your one-line pitch" maxlength="120" rows="2"></textarea>
+        </label>
+        <label class="field">
+          <span>Stack / Tools</span>
+          <input name="stack" placeholder="Your stack" maxlength="80" />
+        </label>
+        <div class="row">
+          <label class="field">
+            <span>Twitter / X</span>
+            <input name="twitter" placeholder="Your Twitter" maxlength="30" />
+          </label>
+          <label class="field">
+            <span>LinkedIn</span>
+            <input name="linkedin" placeholder="Your LinkedIn" maxlength="80" />
+          </label>
+        </div>
+        <label class="field">
+          <span>Builder stage</span>
+          <select name="stage">
+            <option>Idea</option>
+            <option selected>Early prototype</option>
+            <option>Beta</option>
+            <option>Launched</option>
+            <option>Scaling</option>
+          </select>
+        </label>
+        <div class="field">
+          <span>AI Avatar — Nano Banana ✨</span>
+          <div class="avatar-maker">
+            <div class="avatar-row">
+              <label for="photo-input" class="upload-slot" id="upload-slot">
+                <div class="upload-placeholder">
+                  <div class="big">📷</div>
+                  <div>upload photo</div>
+                </div>
+              </label>
+              <input type="file" id="photo-input" accept="image/*" capture="user" hidden />
+              <div class="style-grid" id="style-grid"></div>
+            </div>
+            <button type="button" class="ghost-cta" id="btn-generate" disabled>✨ Generate avatar</button>
+            <div class="gen-status" id="gen-status"></div>
+          </div>
+          <input type="hidden" name="avatar" value="superhero" />
+        </div>
+        <button type="submit" class="cta">Save my card + join VibeCon ↗</button>
+      </form>
+    </div>
+
+    <div class="card-col">
+      <div id="card" class="card">
+        <div class="card-head">
+          <div class="card-head-left">
+            <img src="yc.svg" alt="" class="logo" />
+            <span class="card-id">#VC-0000</span>
+          </div>
+          <div class="card-logos">
+            <img src="logo1.jpg" alt="" class="logo" />
+            <img src="logo2.jpg" alt="" class="logo" />
+            <span class="card-badge">VC '25</span>
+          </div>
+        </div>
+        <div class="card-identity">
+          <img class="card-avatar" id="card-avatar" alt="" />
+          <div>
+            <h2 class="card-name" data-field="name">Your name</h2>
+            <div class="card-project" data-field="building">Your project</div>
+          </div>
+        </div>
+        <div class="card-pitch"><span data-field="pitch">"your one-line pitch goes here"</span></div>
+        <div class="card-stats">
+          <div class="stat"><span class="k">STACK</span><span class="v" data-field="stack">—</span></div>
+          <div class="stat"><span class="k">STAGE</span><span class="v" data-field="stage">Early prototype</span></div>
+          <div class="stat"><span class="k">EVENT</span><span class="v">VibeCon 2025</span></div>
+          <div class="stat"><span class="k">CARD TYPE</span><span class="v">Builder</span></div>
+        </div>
+        <div class="card-foot">
+          <div class="card-socials">
+            <div><span class="pre">tw</span> <span data-field="twitter">@handle</span></div>
+            <div><span class="pre">li</span> <span data-field="linkedin">linkedin</span></div>
+          </div>
+          <div class="card-qr-wrap">
+            <div class="qr-box"><canvas id="qr"></canvas></div>
+            <div class="qr-caption">SCAN TO CONNECT</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="ghost" id="btn-copy">copy card info</button>
+        <button class="ghost" id="btn-download">download card</button>
+        <button class="ghost" id="btn-view">view collection</button>
+      </div>
+    </div>
+  </section>
+</template>
+
+<template id="view-cardonly">
+  <section class="cardonly">
+    <p class="sub center">// you scanned a builder card</p>
+    <div id="card" class="card">
+      <div class="card-head">
+        <div class="card-head-left">
+          <img src="yc.svg" alt="" class="logo" />
+          <span class="card-id">#VC-0000</span>
+        </div>
+        <div class="card-logos">
+          <img src="logo1.jpg" alt="" class="logo" />
+          <img src="logo2.jpg" alt="" class="logo" />
+          <span class="card-badge">VC '25</span>
+        </div>
+      </div>
+      <div class="card-identity">
+        <img class="card-avatar" id="card-avatar" alt="" />
+        <div>
+          <h2 class="card-name" data-field="name">Your name</h2>
+          <div class="card-project" data-field="building">Your project</div>
+        </div>
+      </div>
+      <div class="card-pitch"><span data-field="pitch">"your one-line pitch goes here"</span></div>
+      <div class="card-stats">
+        <div class="stat"><span class="k">STACK</span><span class="v" data-field="stack">—</span></div>
+        <div class="stat"><span class="k">STAGE</span><span class="v" data-field="stage">Early prototype</span></div>
+        <div class="stat"><span class="k">EVENT</span><span class="v">VibeCon 2025</span></div>
+        <div class="stat"><span class="k">CARD TYPE</span><span class="v">Builder</span></div>
+      </div>
+      <div class="card-foot">
+        <div class="card-socials">
+          <div><span class="pre">tw</span> <span data-field="twitter">@handle</span></div>
+          <div><span class="pre">li</span> <span data-field="linkedin">linkedin</span></div>
+        </div>
+        <div class="card-qr-wrap">
+          <div class="qr-box"><canvas id="qr"></canvas></div>
+          <div class="qr-caption">SCAN TO CONNECT</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-actions">
+      <button class="cta small" id="btn-download">Download card ↓</button>
+    </div>
+  </section>
+</template>
+
+<template id="view-collection">
+  <section class="collection">
+    <h1 class="display">My collection</h1>
+    <p class="sub">// builders you've met at VibeCon.</p>
+    <div id="collection-grid" class="grid"></div>
+    <div id="collection-empty" class="empty" hidden>
+      no cards yet. scan someone's QR to start collecting.
+    </div>
+  </section>
+</template>
+
+<script src="app.js"></script>
+</body>
+</html>
