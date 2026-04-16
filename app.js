@@ -101,7 +101,8 @@ const DEFAULTS = {
 };
 
 function updateCard(data) {
-  app.querySelector(".card-id").textContent = cardIdFor(data.name);
+  const cid = app.querySelector(".card-id");
+  if (cid) cid.textContent = cardIdFor(data.name);
   FIELDS.forEach(f => {
     const raw = (data[f] || "").toString().trim();
     app.querySelectorAll(`[data-field="${f}"]`).forEach(el => {
@@ -211,10 +212,7 @@ function renderCreate(prefill) {
 }
 
 async function downloadCard(card, filename) {
-  const el = card.querySelector(".attending");
-  if (el) { el.style.background = "none"; el.style.webkitBackgroundClip = "unset"; el.style.backgroundClip = "unset"; el.style.color = "#fff"; }
-  const canvas = await html2canvas(card, { backgroundColor: "#0a0a14", scale: 2, useCORS: true });
-  if (el) { el.style.background = ""; el.style.webkitBackgroundClip = ""; el.style.backgroundClip = ""; el.style.color = ""; }
+  const canvas = await html2canvas(card, { backgroundColor: "#000000", scale: 2, useCORS: true });
   const a = document.createElement("a");
   a.download = filename;
   a.href = canvas.toDataURL("image/png");
