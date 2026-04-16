@@ -227,12 +227,12 @@ main { padding: 40px 32px 80px; }
   padding: 28px 24px 22px;
   text-align: center;
 }
-.card-logos-row {
+.event-tag-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  margin-bottom: 22px;
+  gap: 12px;
+  margin-bottom: 10px;
 }
 .logo {
   width: 42px;
@@ -255,7 +255,6 @@ main { padding: 40px 32px 80px; }
   font-size: 13px;
   letter-spacing: 3px;
   color: #999;
-  margin-bottom: 10px;
   text-transform: uppercase;
 }
 .event-date {
