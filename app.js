@@ -199,13 +199,8 @@ function renderCreate(prefill) {
     catch { prompt("Copy:", text); }
   });
 
-  document.getElementById("btn-download").addEventListener("click", async () => {
-    const card = document.getElementById("card");
-    const canvas = await html2canvas(card, { backgroundColor: "#0a0a14", scale: 2, useCORS: true });
-    const link = document.createElement("a");
-    link.download = "vibecon-card.png";
-    link.href = canvas.toDataURL("image/png");
-    link.click();
+  document.getElementById("btn-download").addEventListener("click", () => {
+    downloadCard(document.getElementById("card"), "vibecon-card.png");
   });
 
   document.getElementById("btn-view").addEventListener("click", () => {
@@ -215,18 +210,24 @@ function renderCreate(prefill) {
   refresh();
 }
 
+async function downloadCard(card, filename) {
+  const el = card.querySelector(".attending");
+  if (el) { el.style.background = "none"; el.style.webkitBackgroundClip = "unset"; el.style.backgroundClip = "unset"; el.style.color = "#fff"; }
+  const canvas = await html2canvas(card, { backgroundColor: "#0a0a14", scale: 2, useCORS: true });
+  if (el) { el.style.background = ""; el.style.webkitBackgroundClip = ""; el.style.backgroundClip = ""; el.style.color = ""; }
+  const a = document.createElement("a");
+  a.download = filename;
+  a.href = canvas.toDataURL("image/png");
+  a.click();
+}
+
 function renderCardOnly(data) {
   document.body.classList.add("card-only-mode");
   mount("view-cardonly");
   updateCard(data);
 
-  document.getElementById("btn-download").addEventListener("click", async () => {
-    const card = document.getElementById("card");
-    const canvas = await html2canvas(card, { backgroundColor: "#0a0a14", scale: 2, useCORS: true });
-    const link = document.createElement("a");
-    link.download = (data.name || "vibecon-card").replace(/\s+/g, "-").toLowerCase() + ".png";
-    link.href = canvas.toDataURL("image/png");
-    link.click();
+  document.getElementById("btn-download").addEventListener("click", () => {
+    downloadCard(document.getElementById("card"), (data.name || "vibecon-card").replace(/\s+/g, "-").toLowerCase() + ".png");
   });
 }
 
