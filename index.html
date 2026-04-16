@@ -52,14 +52,24 @@
             <input name="linkedin" placeholder="Your LinkedIn" maxlength="80" />
           </label>
         </div>
-        <div class="row">
+        <div class="rating-group">
           <label class="field">
-            <span>Debugging <em class="range-val" id="dbg-val">5</em>/10</span>
-            <input type="range" name="debugging" min="1" max="10" value="5" />
+            <span>Skill 1 name</span>
+            <input name="skill1" placeholder="Debugging" maxlength="20" value="Debugging" />
           </label>
+          <label class="field range-field">
+            <span>Rating <em class="range-val" id="r1-val">5</em>/10</span>
+            <input type="range" name="rating1" min="1" max="10" value="5" />
+          </label>
+        </div>
+        <div class="rating-group">
           <label class="field">
-            <span>Vibecoding <em class="range-val" id="vbc-val">5</em>/10</span>
-            <input type="range" name="vibecoding" min="1" max="10" value="5" />
+            <span>Skill 2 name</span>
+            <input name="skill2" placeholder="Vibecoding" maxlength="20" value="Vibecoding" />
+          </label>
+          <label class="field range-field">
+            <span>Rating <em class="range-val" id="r2-val">5</em>/10</span>
+            <input type="range" name="rating2" min="1" max="10" value="5" />
           </label>
         </div>
         <div class="field">
@@ -109,12 +119,12 @@
 
           <div class="card-ratings">
             <div class="rating-row">
-              <span class="rating-label">Debugging</span>
-              <div class="rating-dots" data-field="debugging"></div>
+              <span class="rating-label" data-field="skill1">Debugging</span>
+              <div class="rating-dots" data-field="rating1"></div>
             </div>
             <div class="rating-row">
-              <span class="rating-label">Vibecoding</span>
-              <div class="rating-dots" data-field="vibecoding"></div>
+              <span class="rating-label" data-field="skill2">Vibecoding</span>
+              <div class="rating-dots" data-field="rating2"></div>
             </div>
           </div>
 

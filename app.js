@@ -14,7 +14,7 @@ async function uploadAvatarToStorage(dataUrl) {
   return _sb.storage.from("avatars").getPublicUrl(data.path).data.publicUrl;
 }
 
-const FIELDS = ["name", "building", "pitch", "twitter", "linkedin", "avatar", "debugging", "vibecoding"];
+const FIELDS = ["name", "building", "pitch", "twitter", "linkedin", "avatar", "skill1", "rating1", "skill2", "rating2"];
 const avatarFallback = (seed) =>
   `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(seed || "vibecon")}`;
 
@@ -94,8 +94,10 @@ const DEFAULTS = {
   pitch: '"your one-line pitch goes here"',
   twitter: "@handle",
   linkedin: "linkedin",
-  debugging: "5",
-  vibecoding: "5",
+  skill1: "Debugging",
+  rating1: "5",
+  skill2: "Vibecoding",
+  rating2: "5",
 };
 
 function updateCard(data) {
@@ -103,7 +105,7 @@ function updateCard(data) {
   FIELDS.forEach(f => {
     const raw = (data[f] || "").toString().trim();
     app.querySelectorAll(`[data-field="${f}"]`).forEach(el => {
-      if (f === "debugging" || f === "vibecoding") {
+      if (f === "rating1" || f === "rating2") {
         const rating = Math.min(10, Math.max(1, parseInt(raw, 10) || 5));
         el.innerHTML = Array.from({ length: 10 }, (_, i) =>
           `<span class="rdot${i < rating ? " on" : ""}"></span>`
@@ -156,10 +158,10 @@ function renderCreate(prefill) {
   buildPhotoUpload(refresh);
 
   // Wire up range value labels
-  const dbgIn = form.querySelector('[name="debugging"]');
-  const vbcIn = form.querySelector('[name="vibecoding"]');
-  if (dbgIn) dbgIn.addEventListener("input", () => { const el = document.getElementById("dbg-val"); if (el) el.textContent = dbgIn.value; });
-  if (vbcIn) vbcIn.addEventListener("input", () => { const el = document.getElementById("vbc-val"); if (el) el.textContent = vbcIn.value; });
+  const r1In = form.querySelector('[name="rating1"]');
+  const r2In = form.querySelector('[name="rating2"]');
+  if (r1In) r1In.addEventListener("input", () => { const el = document.getElementById("r1-val"); if (el) el.textContent = r1In.value; });
+  if (r2In) r2In.addEventListener("input", () => { const el = document.getElementById("r2-val"); if (el) el.textContent = r2In.value; });
 
   const savedAv = localStorage.getItem(AVATAR_LS((prefill && prefill.name) || readForm().name));
   if (savedAv) {
@@ -190,8 +192,8 @@ function renderCreate(prefill) {
       `"${d.pitch || ""}"\n` +
       (d.twitter ? `Twitter: ${d.twitter}\n` : "") +
       (d.linkedin ? `LinkedIn: ${d.linkedin}\n` : "") +
-      (d.debugging ? `Debugging: ${d.debugging}/10\n` : "") +
-      (d.vibecoding ? `Vibecoding: ${d.vibecoding}/10\n` : "") +
+      (d.rating1 ? `${d.skill1 || "Skill 1"}: ${d.rating1}/10\n` : "") +
+      (d.rating2 ? `${d.skill2 || "Skill 2"}: ${d.rating2}/10\n` : "") +
       link;
     try { await navigator.clipboard.writeText(text); toast("Card info copied"); }
     catch { prompt("Copy:", text); }
