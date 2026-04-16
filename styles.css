@@ -283,6 +283,10 @@ main { padding: 40px 32px 80px; }
     0 0 15px #0066ffaa,
     0 0 40px #0066ff55,
     0 0 80px #0066ff25;
+  color: transparent;
+}
+.card-avatar:not([src]), .card-avatar[src=""] {
+  visibility: hidden;
 }
 
 /* Bottom section */
