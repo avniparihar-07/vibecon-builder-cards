@@ -14,7 +14,7 @@ async function uploadAvatarToStorage(dataUrl) {
   return _sb.storage.from("avatars").getPublicUrl(data.path).data.publicUrl;
 }
 
-const FIELDS = ["name", "building", "pitch", "twitter", "linkedin", "avatar"];
+const FIELDS = ["name", "building", "pitch", "twitter", "linkedin", "avatar", "debugging", "vibecoding"];
 const avatarFallback = (seed) =>
   `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(seed || "vibecon")}`;
 
@@ -94,6 +94,8 @@ const DEFAULTS = {
   pitch: '"your one-line pitch goes here"',
   twitter: "@handle",
   linkedin: "linkedin",
+  debugging: "5",
+  vibecoding: "5",
 };
 
 function updateCard(data) {
@@ -101,8 +103,16 @@ function updateCard(data) {
   FIELDS.forEach(f => {
     const raw = (data[f] || "").toString().trim();
     app.querySelectorAll(`[data-field="${f}"]`).forEach(el => {
-      if (f === "pitch") el.textContent = raw ? `"${raw}"` : DEFAULTS.pitch;
-      else el.textContent = raw || DEFAULTS[f];
+      if (f === "debugging" || f === "vibecoding") {
+        const rating = Math.min(10, Math.max(1, parseInt(raw, 10) || 5));
+        el.innerHTML = Array.from({ length: 10 }, (_, i) =>
+          `<span class="rdot${i < rating ? " on" : ""}"></span>`
+        ).join("");
+      } else if (f === "pitch") {
+        el.textContent = raw ? `"${raw}"` : DEFAULTS.pitch;
+      } else {
+        el.textContent = raw || DEFAULTS[f];
+      }
     });
   });
   const av = app.querySelector("#card-avatar");
@@ -114,25 +124,6 @@ function updateCard(data) {
     else if (data.avatar) { av.src = data.avatar; av.style.imageRendering = ""; }
     else { av.src = avatarFallback(data.name || "vibecon"); av.style.imageRendering = ""; }
   }
-
-  const qrEl = document.getElementById("qr");
-  if (!qrEl) return;
-  const url = location.origin + location.pathname + "#c=" + encodeCard(data);
-  try {
-    new QRious({
-      element: qrEl,
-      value: url,
-      size: 400,
-      level: "M",
-      background: "#ffffff",
-      foreground: "#0a0a14",
-      padding: 10,
-    });
-  } catch (e) {
-    console.error("QR render failed", e);
-  }
-  qrEl.style.width = "200px";
-  qrEl.style.height = "200px";
 }
 
 function readForm() {
@@ -163,6 +154,13 @@ function renderCreate(prefill) {
 
   // Photo upload
   buildPhotoUpload(refresh);
+
+  // Wire up range value labels
+  const dbgIn = form.querySelector('[name="debugging"]');
+  const vbcIn = form.querySelector('[name="vibecoding"]');
+  if (dbgIn) dbgIn.addEventListener("input", () => { const el = document.getElementById("dbg-val"); if (el) el.textContent = dbgIn.value; });
+  if (vbcIn) vbcIn.addEventListener("input", () => { const el = document.getElementById("vbc-val"); if (el) el.textContent = vbcIn.value; });
+
   const savedAv = localStorage.getItem(AVATAR_LS((prefill && prefill.name) || readForm().name));
   if (savedAv) {
     uploadedPhoto = savedAv;
@@ -192,6 +190,8 @@ function renderCreate(prefill) {
       `"${d.pitch || ""}"\n` +
       (d.twitter ? `Twitter: ${d.twitter}\n` : "") +
       (d.linkedin ? `LinkedIn: ${d.linkedin}\n` : "") +
+      (d.debugging ? `Debugging: ${d.debugging}/10\n` : "") +
+      (d.vibecoding ? `Vibecoding: ${d.vibecoding}/10\n` : "") +
       link;
     try { await navigator.clipboard.writeText(text); toast("Card info copied"); }
     catch { prompt("Copy:", text); }
