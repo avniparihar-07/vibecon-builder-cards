@@ -252,7 +252,7 @@ main { padding: 40px 32px 80px; }
 }
 .event-tag {
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 13px;
   letter-spacing: 3px;
   color: #999;
   margin-bottom: 10px;
