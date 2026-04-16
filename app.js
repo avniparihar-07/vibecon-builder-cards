@@ -14,7 +14,7 @@ async function uploadAvatarToStorage(dataUrl) {
   return _sb.storage.from("avatars").getPublicUrl(data.path).data.publicUrl;
 }
 
-const FIELDS = ["name", "building", "pitch", "twitter", "linkedin", "avatar", "skill1", "rating1", "skill2", "rating2"];
+const FIELDS = ["name", "building", "pitch", "avatar", "skill1", "rating1", "skill2", "rating2"];
 const avatarFallback = (seed) =>
   `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(seed || "vibecon")}`;
 
@@ -92,8 +92,6 @@ const DEFAULTS = {
   name: "Your name",
   building: "Your project",
   pitch: '"your one-line pitch goes here"',
-  twitter: "@handle",
-  linkedin: "linkedin",
   skill1: "Debugging",
   rating1: "5",
   skill2: "Vibecoding",
@@ -191,8 +189,6 @@ function renderCreate(prefill) {
     const text =
       `${d.name || "Builder"} — ${d.building || ""}\n` +
       `"${d.pitch || ""}"\n` +
-      (d.twitter ? `Twitter: ${d.twitter}\n` : "") +
-      (d.linkedin ? `LinkedIn: ${d.linkedin}\n` : "") +
       (d.rating1 ? `${d.skill1 || "Skill 1"}: ${d.rating1}/10\n` : "") +
       (d.rating2 ? `${d.skill2 || "Skill 2"}: ${d.rating2}/10\n` : "") +
       link;
