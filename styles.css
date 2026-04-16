@@ -202,7 +202,10 @@ main { padding: 40px 32px 80px; }
 
 .card {
   width: 100%;
-  max-width: 380px;
+  max-width: 340px;
+  aspect-ratio: 9 / 18;
+  display: flex;
+  flex-direction: column;
   background: #000000;
   border: 1px solid #1a3a6a;
   border-radius: 20px;
@@ -268,10 +271,12 @@ main { padding: 40px 32px 80px; }
 .card-photo-frame {
   padding: 0 20px;
   margin-bottom: 0;
+  flex: 1;
+  min-height: 0;
 }
 .card-avatar {
   width: 100%;
-  height: 300px;
+  height: 100%;
   border-radius: 14px;
   object-fit: cover;
   object-position: center top;
@@ -549,7 +554,7 @@ body.card-only-mode main { padding: 40px 20px; }
 @media (max-width: 500px) {
   .card-name { font-size: 26px; }
   .attending { font-size: 42px; }
-  .card-avatar { height: 240px; }
+  .card-avatar { height: 100%; }
   .card { border-radius: 16px; }
   .card-photo-frame { padding: 0 16px; }
   main { padding: 18px 14px 60px; }
